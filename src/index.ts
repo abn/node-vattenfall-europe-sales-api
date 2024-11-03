@@ -30,6 +30,15 @@ export class VattenfallEuropeSales {
     private readonly api_tenant: string = "VESALES";
 
     /**
+     * The number of seconds that an access token remains valid.
+     *
+     * This value determines the time-to-live (TTL) for access tokens,
+     * ensuring they expire after a certain period of inactivity or usage.
+     * Typically used to control session timeouts and enhance security.
+     */
+    private readonly access_token_ttl_seconds: number = 10 * 60;
+
+    /**
      * The URI that points to the properties configuration file for the Vattenfall service.
      * This URI is used to fetch various properties and settings required for the service's operation.
      */
@@ -154,7 +163,7 @@ export class VattenfallEuropeSales {
 
         const expiry_date = new Date(this._access_token_data.InterneZeit);
         const now = new Date();
-        const buffered_ttl_ms = 14 * 60 * 1000; // 14 minutes from creation time
+        const buffered_ttl_ms = (this.access_token_ttl_seconds - 60) * 1000; // buffer 1 minute
 
         return expiry_date.getTime() + buffered_ttl_ms <= now.getTime();
     }
