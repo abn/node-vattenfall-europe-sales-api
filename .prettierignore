@@ -1,0 +1,5 @@
+docs/**
+node_modules/**
+.gitignore
+.github/**
+pnpm-lock.yaml
