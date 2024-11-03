@@ -6,12 +6,12 @@
   "scripts": {
     "build": "tsc",
     "preinstall": "npx only-allow pnpm",
-    "lint:check": "eslint",
+    "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "quality:check": "pnpm run format:check && pnpm run lint",
-    "quality:fix": "pnpm run format && pnpm run lint:check",
+    "quality:fix": "pnpm run format && pnpm run lint:fix",
     "docs": "npx typedoc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
