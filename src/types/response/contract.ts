@@ -8,7 +8,7 @@ export interface ContractResponse extends Response {
     };
 }
 
-interface ContractPartner {
+export interface ContractPartner {
     GP: GeneralPartner; // BusinessPartner
     Username?: string; // Username
     Anrede: CodeDescription; // Salutation
@@ -29,7 +29,7 @@ interface ContractPartner {
     Werte: Record<string, unknown>; // Values
 }
 
-interface GeneralPartner {
+export interface GeneralPartner {
     Art: string; // Type
     Typ: string; // Type
     ReferenzID: string; // ReferenceID
@@ -37,7 +37,7 @@ interface GeneralPartner {
     Datenherkunftsart: CodeDescription; // DataSourceType
 }
 
-interface Contract {
+export interface Contract {
     VK: {
         ReferenzID: string; // ReferenceID
         Anzeigetext: string; // DisplayText
@@ -65,7 +65,7 @@ interface Contract {
     Produktwechselangebote?: unknown[]; // ProductChangeOffers
 }
 
-interface ContractPeriod {
+export interface ContractPeriod {
     ZeitscheibeVon: string; // TimeSliceFrom
     ZeitscheibeBis: null | string; // TimeSliceTo
     RelevanteZeitscheibe: boolean; // RelevantTimeSlice
@@ -88,18 +88,18 @@ interface ContractPeriod {
         TimeLimit
     >;
     Bonussteuerung: BonusControl; // BonusControl
-    Inhalte: Inhalte; // Contents
+    Inhalte: ContractReferenceContent; // Contents
     Werte: ContractPeriodValues; // Values
 }
 
-interface Warranty {
+export interface Warranty {
     Anzahl?: number; // Number
     Code: string; // Code
     Anzeigetext: string; // DisplayText
     Label: string; // Label
 }
 
-interface PricePeriod {
+export interface PricePeriod {
     PreiszeitscheibeVon: string; // PriceTimeSliceFrom
     PreiszeitscheibeBis: null | string; // PriceTimeSliceTo
     RelevanteZeitscheibe: boolean; // RelevantTimeSlice
@@ -108,9 +108,9 @@ interface PricePeriod {
     Preisstaffel: PriceStep[]; // PriceTier
 }
 
-type Unit = null | CodeDescription | "kWh"; // Unit
+export type Unit = null | CodeDescription | "kWh"; // Unit
 
-interface PriceStep {
+export interface PriceStep {
     PSTCode: string; // PriceStepCode
     Energiemenge: EnergyAmount; // EnergyAmount
     RelevanteStaffel: boolean; // RelevantTier
@@ -124,26 +124,26 @@ interface PriceStep {
     MaxPreisVario: null | unknown; // MaxPriceVario
 }
 
-interface EnergyAmount {
+export interface EnergyAmount {
     Von: number; // From
     Bis: number; // To
     Einheit: Unit; // Unit
     Anzeigetext: string; // DisplayText
 }
 
-interface ConsumptionPrice {
+export interface ConsumptionPrice {
     Verbrauchspreis: NettoBrutto; // ConsumptionPrice
     VerbrauchspreisHT: null | NettoBrutto; // HighTariffConsumptionPrice
     VerbrauchspreisNT: null | NettoBrutto; // LowTariffConsumptionPrice
 }
 
-interface BonusControl {
+export interface BonusControl {
     BSCode: string; // BonusControlCode
     Bonuswerte: BonusValue[]; // BonusValues
-    Inhalte: Inhalte; // Contents
+    Inhalte: ContractReferenceContent; // Contents
 }
 
-interface BonusValue {
+export interface BonusValue {
     Name: string; // Name
     Einheit: Unit; // Unit
     MwSt: number; // VAT (Value Added Tax)
@@ -152,10 +152,10 @@ interface BonusValue {
     Verrechnet: null | unknown; // Settled
     Verrechnungsdatum: null | unknown; // SettlementDate
     VerrechnetMit: null | string; // SettledWith
-    Inhalte: Inhalte; // Contents
+    Inhalte: ContractReferenceContent; // Contents
 }
 
-interface BonusStep {
+export interface BonusStep {
     BonusID: string; // BonusID
     StaffelVon: number; // TierFrom
     StaffelBis: number; // TierTo
@@ -163,7 +163,7 @@ interface BonusStep {
     RelevanteStaffel: boolean; // RelevantTier
 }
 
-interface ContractPeriodValues {
+export interface ContractPeriodValues {
     BONITAET: string; // CreditRating
     DOKUMENTENVERSANDART: string; // DocumentDispatchMethod
     IST_SCHREIBEN_VERTRAGSBINDUNG: BooleanString; // IsContractualBindingLetter
@@ -175,7 +175,7 @@ interface ContractPeriodValues {
     ENDE_PREISGARANTIE: string; // EndOfPriceWarranty
 }
 
-interface MeterData {
+export interface MeterData {
     Jahresverbrauch: number; // AnnualConsumption
     Zaehlernummer: string; // MeterNumber
     Zaehlerart: CodeDescription; // MeterType
@@ -183,7 +183,7 @@ interface MeterData {
     OffenerAbleseauftrag: null | unknown; // OpenReadingOrder
 }
 
-interface ContractValues {
+export interface ContractValues {
     NETZNUMMER?: string; // NetworkNumber
     VERTRAG_AB_ALT?: string; // ContractFromOld
     DOKUMENTENVERSANDART?: string; // DocumentDispatchMethod
@@ -196,14 +196,14 @@ interface ContractValues {
     IST_IMS?: BooleanString;
 }
 
-type TimeLimit = {
+export type TimeLimit = {
     Anzahl?: number; // Number
     Code: string; // Code
     Anzeigetext: string; // DisplayText
     Label: string; // Label
 };
 
-type Inhalte = null | {
+export type ContractReferenceContent = null | {
     // Contents
     TextReferenzIds: null | string[]; // TextReferenceIds
     DokumenteReferenzIds: null | string[]; // DocumentReferenceIds
@@ -213,11 +213,11 @@ type Inhalte = null | {
     SteuerelementeReferenzIds: null | string[]; // ControlElementReferenceIds
 };
 
-interface ReferenceItem {
+export interface ReferenceItem {
     ReferenzID: string; // ReferenceID
 }
 
-type ReferenceItemContent = {
+export type ReferenceItemContent = {
     Kurztext: string; // ShortText
     Langtext?: string; // LongText
     Hauptkategorie: null | string; // MainCategory
@@ -225,7 +225,7 @@ type ReferenceItemContent = {
     Properties: Record<string, unknown>; // Properties
 };
 
-type ReferenceItemLinkedContent = ReferenceItemContent & {
+export type ReferenceItemLinkedContent = ReferenceItemContent & {
     ID: {
         SystemId: string; // SystemID
         DateiId: string; // FileID
@@ -236,21 +236,21 @@ type ReferenceItemLinkedContent = ReferenceItemContent & {
     Groesse: number; // Size
 };
 
-interface ReferenceDocument extends ReferenceItem {
+export interface ReferenceDocument extends ReferenceItem {
     Dokument: ReferenceItemLinkedContent; // Document
 }
 
-interface ReferenceText extends ReferenceItem {
+export interface ReferenceText extends ReferenceItem {
     Text: ReferenceItemContent & {
         ID: string; // ID
     };
 }
 
-interface ReferenceMedia extends ReferenceItem {
+export interface ReferenceMedia extends ReferenceItem {
     Medium: ReferenceItemLinkedContent; // Medium
 }
 
-interface ReferenceParameter extends ReferenceItem {
+export interface ReferenceParameter extends ReferenceItem {
     Parameter: Omit<ReferenceItemContent, "Kurztext" | "Langtext"> & {
         Name: string; // Name
         Wert: string; // Value
@@ -258,7 +258,7 @@ interface ReferenceParameter extends ReferenceItem {
     };
 }
 
-interface References {
+export interface References {
     Dokumente: ReferenceDocument[]; // Documents
     Texte: ReferenceText[]; // Texts
     Medien: ReferenceMedia[]; // Media
@@ -267,7 +267,7 @@ interface References {
     Steuerelemente: unknown[]; // ControlElements
 }
 
-type Address = {
+export type Address = {
     Strasse: string; // Street
     Hausnummer: string; // HouseNumber
     PLZ: string; // PostalCode
@@ -275,27 +275,27 @@ type Address = {
     Land: string; // Country
 };
 
-type ContactInfoEmail = {
+export type ContactInfoEmail = {
     Code: "EMAILADRESSE"; // EMAILADDRESS
     Anzeigetext: "E-Mailadresse"; // EmailAddress
     Wert: string; // Value
 };
 
-type ContactInfoMobile = {
+export type ContactInfoMobile = {
     Code: "MOBILENUMMER"; // MOBILEPHONE
     Anzeigetext: "Mobilenummer"; // MobileNumber
     Wert: string; // Value
 };
 
-type ContactInfoTelephone = {
+export type ContactInfoTelephone = {
     Code: "TELEFONNUMMER"; // TELEPHONE
     Anzeigetext: "Telefonnummer"; // TelephoneNumber
     Wert: string; // Value
 };
 
-type ContactInfo = ContactInfoEmail | ContactInfoMobile | ContactInfoTelephone;
+export type ContactInfo = ContactInfoEmail | ContactInfoMobile | ContactInfoTelephone;
 
-type NettoBrutto = {
+export type NettoBrutto = {
     Netto: null | number; // Net
     Brutto: null | number; // Gross
 };

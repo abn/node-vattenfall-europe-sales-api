@@ -1,7 +1,11 @@
 import { RequestData } from "./common";
 
-export interface ContractRequestData extends RequestData {
+export interface MultiContractRequestData extends RequestData {
     VK: string[];
+}
+
+export interface ContractRequestData extends RequestData {
+    VK: string;
 }
 
 export interface ContractListRequestData extends RequestData {

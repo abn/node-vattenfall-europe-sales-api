@@ -90,6 +90,14 @@ export class VattenfallEuropeSales {
     private _parent_log_id?: string;
 
     /**
+     * A boolean flag that indicates whether debug logging is enabled.
+     * When set to true, the application will output additional debug
+     * information to the logs. This can be useful for troubleshooting
+     * and development purposes. Default value is false.
+     */
+    private _debug_logging_enabled = false;
+
+    /**
      * Constructs an instance of the class with a unique transaction ID, username, and password.
      *
      * @param username - The username for the instance.
@@ -110,6 +118,14 @@ export class VattenfallEuropeSales {
      */
     protected error(message: string): never {
         throw new VattenfallServiceError({ message: message });
+    }
+
+    protected debug(...data: unknown[]): void {
+        if (this._debug_logging_enabled) console.log(...data);
+    }
+
+    public setDebugLogging(enabled: boolean): void {
+        this._debug_logging_enabled = enabled;
     }
 
     /**
@@ -135,12 +151,15 @@ export class VattenfallEuropeSales {
      * @returns A promise that resolves to the service properties.
      */
     public async getServiceProperties(): Promise<Types.ServiceProperties> {
-        if (!this._properties)
+        if (!this._properties) {
             this._properties =
                 ((await fetch(this.service_properties_uri)
                     .then((response) => response.json())
                     .catch(this.error)) as Types.ServiceProperties) ??
                 this.error("Unable to retrieve service properties");
+            this.debug("Service properties retrieved: ", this._properties);
+        }
+
         return this._properties;
     }
 
@@ -159,7 +178,7 @@ export class VattenfallEuropeSales {
      * @returns True if the token is expired, otherwise false.
      */
     public isTokenExpired(): boolean {
-        if (!this._access_token_data) return true;
+        if (!this.isAuthenticated() || this._access_token_data?.InterneZeit === undefined) return true;
 
         const expiry_date = new Date(this._access_token_data.InterneZeit);
         const now = new Date();
@@ -208,6 +227,8 @@ export class VattenfallEuropeSales {
             });
         }
 
+        this.debug(method, full_uri, options);
+
         const response = await fetch(full_uri, options).catch(this.error);
 
         if (!response.ok) {
@@ -219,6 +240,8 @@ export class VattenfallEuropeSales {
         if (response.body == null) return {} as R;
 
         const response_json = (await response.json().catch(() => {})) as R;
+
+        if (this._debug_logging_enabled) this.debug(JSON.stringify(response_json, null, 2));
 
         this.raiseOnErrorResponse(response_json);
 
@@ -281,7 +304,7 @@ export class VattenfallEuropeSales {
      * @returns A promise that resolves once the access token is refreshed or a new one is retrieved.
      */
     public async refreshAccessToken(): Promise<void> {
-        if (!this._access_token_data) {
+        if (!this.isAuthenticated() || this._access_token_data?.RefreshToken === undefined) {
             await this.getAccessToken(true);
             return;
         }
@@ -306,34 +329,33 @@ export class VattenfallEuropeSales {
      * @returns A promise that resolves to the access token string.
      */
     public async getAccessToken(force: boolean = false): Promise<string> {
-        const refresh = this._access_token_data && this.isTokenExpired();
+        const refresh = this.isAuthenticated() && this.isTokenExpired();
 
         if (refresh && !force) {
+            this.debug("Existing session is expired, refreshing access token...");
             await this.refreshAccessToken();
             return this._access_token_data?.AccessToken ?? this.error("Failed to retrieve access token");
         }
 
-        const response = await this.post<Types.TokenResponse, Types.GetTokenUserRequestData>("/Account/GetTokenUser", {
-            Tenant: this.api_client,
-            Username: this.username,
-            Passwort: this.password,
-            Werte: {
-                TwoStepAuth: "true",
-                CheckOnlyBenutzerId: "false",
-                NEUE_NUTZUNGSBEDINGUNGEN_BESTAETIGT: "false",
-            },
-        });
+        if (!this.isAuthenticated()) {
+            const response = await this.post<Types.TokenResponse, Types.GetTokenUserRequestData>(
+                "/Account/GetTokenUser",
+                {
+                    Tenant: this.api_client,
+                    Username: this.username,
+                    Passwort: this.password,
+                    Werte: {
+                        TwoStepAuth: "true",
+                        CheckOnlyBenutzerId: "false",
+                        NEUE_NUTZUNGSBEDINGUNGEN_BESTAETIGT: "false",
+                    },
+                },
+            );
+            this._access_token_data = response.Result;
+            this.debug("New access token retrieved: ", this._access_token_data);
+        }
 
-        this._access_token_data = response.Result;
-
-        // TODO: remove this
-        console.log(
-            this._access_token_data,
-            this._parent_log_id,
-            this.transaction_id,
-            this._properties?.DI_SUBSCRIPTION_KEY,
-        );
-
+        if (this._access_token_data?.AccessToken === undefined) this.error("Access token cannot be accessed");
         return this._access_token_data.AccessToken;
     }
 
@@ -350,7 +372,7 @@ export class VattenfallEuropeSales {
     public async logOut(): Promise<void> {
         if (!this.isAuthenticated()) return;
         try {
-            await this.post("/Account/DeleteToken", {});
+            await this.post<Types.TokenDeleteResponse, Types.RequestData>("/Account/DeleteToken", {});
         } catch (error) {
             if (!(error instanceof VattenfallServiceError && error.isTokenExpiryError())) {
                 // only throw this error if it is not a token expired error
@@ -394,7 +416,7 @@ export class VattenfallEuropeSales {
      * @returns A promise that resolves with the contract data.
      */
     public async getContract(contract_id: string): Promise<Types.ContractResponse> {
-        return this.post<Types.ContractResponse, Types.ContractRequestData>("/Vertrag/GetVertragsliste", {
+        return this.post<Types.ContractResponse, Types.MultiContractRequestData>("/Vertrag/GetVertragsliste", {
             VK: [contract_id],
         });
     }
@@ -407,7 +429,7 @@ export class VattenfallEuropeSales {
      */
     public async getMeterReadings(contract_id: string): Promise<Types.MeterReadingResponse> {
         return this.post<Types.MeterReadingResponse, Types.ContractRequestData>("/Zaehlerstand/GetZaehlerstaende", {
-            VK: [contract_id],
+            VK: contract_id,
         });
     }
 }

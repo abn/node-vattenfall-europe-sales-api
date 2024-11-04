@@ -1,7 +1,13 @@
-export type StatusCode = "OK" | "USER_ERROR" | "ACCESS_DENIED";
+export type StatusCode = "OK" | "USER_ERROR" | "ACCESS_DENIED" | "CLIENT_ERROR";
 
 export type ErrorReport = {
-    Code: string | "ERROR_TOKEN_EXPIRED" | "ERROR_NUTZUNGSBEDINGUNGEN_BESTAETIGUNG_ERFORDERLICH";
+    Code:
+        | string
+        | "ERROR_TOKEN_EXPIRED"
+        | "ERROR_REQUEST_INVALID"
+        | "ERROR_CAPTCHA_BENOETIGT"
+        | "REMARK_TOKEN_INVALIDIERT"
+        | "ERROR_NUTZUNGSBEDINGUNGEN_BESTAETIGUNG_ERFORDERLICH";
     TechnischeBeschreibung: string; // TechnicalDescription
     FachlicheBeschreibung: string; // UserDescription
 };

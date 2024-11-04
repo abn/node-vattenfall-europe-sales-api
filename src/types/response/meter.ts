@@ -1,6 +1,6 @@
 import { Response, CodeDescription } from "./common";
 
-type MeterReadingDetail = {
+export type MeterReadingDetail = {
     Ableseart: CodeDescription | { Code: "SELBSTABLESUNG_ONLINE"; Anzeigetext: "Selbstablesung online" }; // ReadingType
     Ablesedatum: string; // ReadingDate
     Ablesegrund:
@@ -13,7 +13,7 @@ type MeterReadingDetail = {
     Zaehlerstand: number; // MeterReading
 };
 
-type Meter = {
+export type MeterReading = {
     Zaehlwerksart: CodeDescription; // MeterType
     Zaehlerstand: MeterReadingDetail[]; // MeterReadingDetail
 };
@@ -22,7 +22,7 @@ type Meters = {
     Zaehlernummer: string; // MeterNumber
     Zaehlerart: CodeDescription; // MeterType
     Sparte: CodeDescription; // Division
-    Zaehlwerk: Meter[]; // Meter
+    Zaehlwerk: MeterReading[]; // Meter
 };
 
 export interface MeterReadingResponse extends Response {
