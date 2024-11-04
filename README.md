@@ -15,21 +15,21 @@ import { VattenfallEuropeSales } from "./src";
 import * as Helpers from "./src/helpers";
 
 async function displayMeterReadings() {
-  const service = new VattenfallEuropeSales("your-username", "your-password");
-  service.setDebugLogging(true);
+    const service = new VattenfallEuropeSales("your-username", "your-password");
+    service.setDebugLogging(true);
 
-  try {
-    const contract_ids = Helpers.getContractIDs(await service.getContractList());
+    try {
+        const contract_ids = Helpers.getContractIDs(await service.getContractList());
 
-    for (const contract_id of contract_ids) {
-      console.log(`Meter readings for contract ${contract_id}:`);
+        for (const contract_id of contract_ids) {
+            console.log(`Meter readings for contract ${contract_id}:`);
 
-      const meter_readings = Helpers.mapMeterReadings(await service.getMeterReadings(contract_id));
-      console.log(meter_readings);
+            const meter_readings = Helpers.mapMeterReadings(await service.getMeterReadings(contract_id));
+            console.log(meter_readings);
+        }
+    } catch (e) {
+        await service.logOut();
+        throw e;
     }
-  } catch (e) {
-    await service.logOut();
-    throw e;
-  }
 }
 ```
