@@ -2,7 +2,13 @@
   "name": "node-vattenfall-europe-sales-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist/*",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "preinstall": "npx only-allow pnpm",
