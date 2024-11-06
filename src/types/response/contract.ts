@@ -1,5 +1,5 @@
 import { BooleanString } from "../common";
-import { Response, CodeDescription } from "./common";
+import { CodeDescription, Response } from "./common";
 
 export interface ContractResponse extends Response {
     Result: {
