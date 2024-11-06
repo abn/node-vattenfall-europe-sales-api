@@ -16,7 +16,6 @@ import * as Helpers from "vattenfall-europe-sales/helpers";
 
 async function displayMeterReadings() {
     const service = new VattenfallEuropeSales("your-username", "your-password");
-    service.setDebugLogging(true);
 
     try {
         const contract_ids = Helpers.getContractIDs(await service.getContractList());
