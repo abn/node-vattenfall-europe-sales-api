@@ -1,4 +1,4 @@
-import { Response, CodeDescription } from "./common";
+import { CodeDescription, Response } from "./common";
 
 export type MeterReadingDetail = {
     Ableseart: CodeDescription | { Code: "SELBSTABLESUNG_ONLINE"; Anzeigetext: "Selbstablesung online" }; // ReadingType

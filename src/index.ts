@@ -1,16 +1,16 @@
+import * as Errors from "./errors";
 import * as Types from "./types";
-import { VattenfallServiceError } from "./errors";
 
 /**
  * Represents the Vattenfall Europe Sales service, providing methods to interact with the service's API.
  */
-export class VattenfallEuropeSales {
+export default class VattenfallEuropeSales {
     /**
      * The version number of the API that the application is currently using.
      * This variable helps in managing and differentiating between different
      * iterations or releases of the API.
      */
-    private readonly api_version: number = 1.3;
+    public readonly api_version: number = 1.3;
 
     /**
      * The client's API identifier used for making requests.
@@ -36,13 +36,13 @@ export class VattenfallEuropeSales {
      * ensuring they expire after a certain period of inactivity or usage.
      * Typically used to control session timeouts and enhance security.
      */
-    private readonly access_token_ttl_seconds: number = 10 * 60;
+    public readonly access_token_ttl_seconds: number = 10 * 60;
 
     /**
      * The URI that points to the properties configuration file for the Vattenfall service.
      * This URI is used to fetch various properties and settings required for the service's operation.
      */
-    private readonly service_properties_uri = "https://service.vattenfall.de/properties.json";
+    public readonly service_properties_uri = "https://service.vattenfall.de/properties.json";
 
     /**
      * A unique identifier for a transaction.
@@ -117,7 +117,7 @@ export class VattenfallEuropeSales {
      * @returns This method does not return as it always throws an error.
      */
     protected error(message: string): never {
-        throw new VattenfallServiceError({ message: message });
+        throw new Errors.VattenfallServiceError({ message: message });
     }
 
     protected debug(...data: unknown[]): void {
@@ -134,9 +134,9 @@ export class VattenfallEuropeSales {
      * @param response - The API response to check for an error status.
      * @returns Returns nothing if the response is "OK"; otherwise, throws a VattenfallApiError.
      */
-    protected raiseOnErrorResponse(response: Types.Response): void | never {
+    public raiseOnErrorResponse(response: Types.Response): void | never {
         if (response?.StatusCode !== "OK")
-            throw new VattenfallServiceError({
+            throw new Errors.VattenfallServiceError({
                 status_code: response.StatusCode,
                 ...(response.Meldungen.length > 0 ? { data: response.Meldungen[0] } : {}),
             });
@@ -316,7 +316,8 @@ export class VattenfallEuropeSales {
                 })
             ).Result;
         } catch (error) {
-            if (error instanceof VattenfallServiceError && error.isTokenExpiryError()) await this.getAccessToken(true);
+            if (error instanceof Errors.VattenfallServiceError && error.isTokenExpiryError())
+                await this.getAccessToken(true);
             throw error;
         }
     }
@@ -374,7 +375,7 @@ export class VattenfallEuropeSales {
         try {
             await this.post<Types.TokenDeleteResponse, Types.RequestData>("/Account/DeleteToken", {});
         } catch (error) {
-            if (!(error instanceof VattenfallServiceError && error.isTokenExpiryError())) {
+            if (!(error instanceof Errors.VattenfallServiceError && error.isTokenExpiryError())) {
                 // only throw this error if it is not a token expired error
                 throw error;
             }
@@ -416,7 +417,7 @@ export class VattenfallEuropeSales {
      * @returns A promise that resolves with the contract data.
      */
     public async getContract(contract_id: string): Promise<Types.ContractResponse> {
-        return this.post<Types.ContractResponse, Types.MultiContractRequestData>("/Vertrag/GetVertragsliste", {
+        return this.post<Types.ContractResponse, Types.MultiContractRequestData>("/Vertrag/GetVertraege", {
             VK: [contract_id],
         });
     }

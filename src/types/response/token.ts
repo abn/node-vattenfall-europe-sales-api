@@ -1,5 +1,5 @@
-import { ErrorReport, Response } from "./common";
 import { AccessTokenData } from "../common";
+import { ErrorReport, Response } from "./common";
 
 export interface TokenResponse extends Response {
     Result: AccessTokenData;
@@ -14,4 +14,5 @@ export interface TokenDeleteResponse extends Response {
                 FachlicheBeschreibung: "Der Token wurde in den Status 'ungültig' versetzt.";
             },
         ];
+    Result: null;
 }

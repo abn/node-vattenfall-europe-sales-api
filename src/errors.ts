@@ -3,7 +3,7 @@ import { ErrorReport, StatusCode } from "./types";
 /**
  * Represents options for handling errors in the Vattenfall service.
  */
-interface VattenfallServiceErrorOptions {
+export interface VattenfallServiceErrorOptions {
     message?: string;
     status_code?: StatusCode;
     data?: ErrorReport;
