@@ -11,7 +11,7 @@ npm install vattenfall-europe-sales
 ## Example Usage
 
 ```typescript
-import { VattenfallEuropeSales } from "vattenfall-europe-sales";
+import VattenfallEuropeSales from "vattenfall-europe-sales";
 import * as Helpers from "vattenfall-europe-sales/helpers";
 
 async function displayMeterReadings() {
