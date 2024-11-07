@@ -17,7 +17,7 @@ export default class VattenfallEuropeSales {
      * This string is typically configured to represent the name or key
      * associated with the API client in use.
      */
-    private readonly api_client: string = "KSO";
+    protected readonly api_client: string = "KSO";
 
     /**
      * A string representing the tenant identifier for the API.
@@ -27,7 +27,7 @@ export default class VattenfallEuropeSales {
      *
      * Example: "VESALES"
      */
-    private readonly api_tenant: string = "VESALES";
+    protected readonly api_tenant: string = "VESALES";
 
     /**
      * The number of seconds that an access token remains valid.
@@ -50,26 +50,26 @@ export default class VattenfallEuropeSales {
      * within the system. It ensures that each transaction can be
      * distinctly identified.
      */
-    private readonly transaction_id: string;
+    public readonly transaction_id: string;
 
     /**
      * Represents the username of a user in the system.
      * This is a string that uniquely identifies a user.
      */
-    private readonly username: string;
+    protected readonly username: string;
 
     /**
      * Represents the password of a user.
      * This string is used for authenticating the user.
      * It should be kept confidential and secured.
      */
-    private readonly password: string;
+    protected readonly password: string;
 
     /**
      * Represents the properties associated with the service, retrieved at instantiation time from
      * {@link service_properties_uri}.
      */
-    private _properties?: Types.ServiceProperties;
+    protected _properties?: Types.ServiceProperties;
 
     /**
      * Optional variable `_access_token_data` which holds the access token information.
@@ -79,7 +79,7 @@ export default class VattenfallEuropeSales {
      * which typically includes properties such as the token value, expiry time, and possibly
      * other metadata related to authentication and authorization.
      */
-    private _access_token_data?: Types.AccessTokenData;
+    protected _access_token_data?: Types.AccessTokenData;
     /**
      * Represents the unique identifier of the parent log entry.
      * This variable is optional, meaning it might be undefined.
@@ -87,7 +87,7 @@ export default class VattenfallEuropeSales {
      * in a hierarchical log structure, aiding in tracking relational
      * log data.
      */
-    private _parent_log_id?: string;
+    protected _parent_log_id?: string;
 
     /**
      * A boolean flag that indicates whether debug logging is enabled.
@@ -95,19 +95,36 @@ export default class VattenfallEuropeSales {
      * information to the logs. This can be useful for troubleshooting
      * and development purposes. Default value is false.
      */
-    private _debug_logging_enabled = false;
+    protected _debug_logging_enabled = false;
 
     /**
      * Constructs an instance of the class with a unique transaction ID, username, and password.
      *
      * @param username - The username for the instance.
      * @param password - The password for the instance.
-     * @return
      */
     constructor(username: string, password: string) {
         this.transaction_id = crypto.randomUUID().toUpperCase();
         this.username = username;
         this.password = password;
+    }
+
+    /**
+     * Retrieves the access token data.
+     *
+     * @returns The access token data, or undefined if not set.
+     */
+    protected get access_token_data(): Types.AccessTokenData | undefined {
+        return this._access_token_data;
+    }
+
+    /**
+     * Retrieves the service properties.
+     *
+     * @returns The service properties if available, otherwise undefined.
+     */
+    protected get service_properties(): Types.ServiceProperties | undefined {
+        return this._properties;
     }
 
     /**
@@ -120,10 +137,20 @@ export default class VattenfallEuropeSales {
         throw new Errors.VattenfallServiceError({ message: message });
     }
 
+    /**
+     * Logs the provided data to the console if debug logging is enabled.
+     *
+     * @param data - The data to be logged.
+     */
     protected debug(...data: unknown[]): void {
         if (this._debug_logging_enabled) console.log(...data);
     }
 
+    /**
+     * Enables or disables debug logging for the application.
+     *
+     * @param enabled - A boolean value indicating whether debug logging should be enabled.
+     */
     public setDebugLogging(enabled: boolean): void {
         this._debug_logging_enabled = enabled;
     }
@@ -188,19 +215,19 @@ export default class VattenfallEuropeSales {
     }
 
     /**
-     * Makes an HTTP request to the specified URI with the provided method and data,
-     * and returns a promise that resolves to the response.
+     * Makes an HTTP request to the specified URI with the given method and data. This is an internal method that
+     * returns a {Response} object.
      *
-     * @param uri - The URI to send the request to.
-     * @param method - The HTTP method to use for the request. Defaults to GET.
-     * @param data - The data to send with the request. Optional.
-     * @returns A promise that resolves to the response of the HTTP request.
+     * @param uri - The endpoint URI to which the request is made.
+     * @param method - The HTTP method to be used for the request (e.g., GET, POST).
+     * @param data - The data to be sent with the request, if applicable.
+     * @returns A promise that resolves to the response of the request.
      */
-    protected async request<R extends Types.Response, D extends Types.RequestData>(
+    protected async _request<D extends Types.RequestData>(
         uri: string,
         method: Types.HTTPMethod = Types.HTTPMethod.GET,
         data?: D,
-    ): Promise<R> {
+    ): Promise<Response> {
         const properties = await this.getServiceProperties();
         const full_uri = uri.startsWith("/") ? `${properties.DI_HOST}/${this.api_version}${uri}` : uri;
 
@@ -229,14 +256,16 @@ export default class VattenfallEuropeSales {
 
         this.debug(method, full_uri, options);
 
-        const response = await fetch(full_uri, options).catch(this.error);
+        return fetch(full_uri, options).catch(this.error);
+    }
 
-        if (!response.ok) {
-            this.error(
-                `An HTTP error occurred, server responded with status: ${response.status} ${await response.text()}`,
-            );
-        }
-
+    /**
+     * Processes the HTTP response and returns it in the specified format.
+     *
+     * @param {Response} response - The HTTP response to process.
+     * @return {Promise<R>} The processed response in the specified format.
+     */
+    async _processResponse<R extends Types.Response>(response: Response): Promise<R> {
         if (response.body == null) return {} as R;
 
         const response_json = (await response.json().catch(() => {})) as R;
@@ -248,6 +277,24 @@ export default class VattenfallEuropeSales {
         if (response_json?.ParentLogId !== undefined) this._parent_log_id = response_json.ParentLogId;
 
         return response_json;
+    }
+
+    /**
+     * Makes an HTTP request to the specified URI with the provided method and data,
+     * and returns a promise that resolves to the response.
+     *
+     * @param uri - The URI to send the request to.
+     * @param method - The HTTP method to use for the request. Defaults to GET.
+     * @param data - The data to send with the request. Optional.
+     * @returns A promise that resolves to the response of the HTTP request.
+     */
+    protected async request<R extends Types.Response, D extends Types.RequestData>(
+        uri: string,
+        method: Types.HTTPMethod = Types.HTTPMethod.GET,
+        data?: D,
+    ): Promise<R> {
+        const response = await this._request(uri, method, data);
+        return this._processResponse(response);
     }
 
     /**
