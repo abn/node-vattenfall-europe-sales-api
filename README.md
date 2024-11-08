@@ -5,7 +5,11 @@ This is a node client libary written in Typescript, which provides methods to in
 ## Installation
 
 ```bash
-npm install vattenfall-europe-sales
+# using npm
+npm install vattenfall-europe-sales-api
+
+# using pnpm
+pnpm add vattenfall-europe-sales-api
 ```
 
 ## Example Usage
