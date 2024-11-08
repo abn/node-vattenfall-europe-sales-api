@@ -208,7 +208,7 @@ export class VattenfallService {
      * @param username - The username to be set.
      * @param password - The password to be set.
      */
-    public async setCredentials(username: string, password: string): void {
+    public async setCredentials(username: string, password: string): Promise<void> {
         await this.resetTransactionId();
 
         this._username = username;
