@@ -1,6 +1,9 @@
 import * as Errors from "./errors";
 import * as Types from "./types";
 
+export * as VattenfallServiceHelpers from "./helpers";
+export { VattenfallServiceError } from "./errors";
+
 /**
  * Represents the Vattenfall Europe Sales service, providing methods to interact with the service's API.
  */

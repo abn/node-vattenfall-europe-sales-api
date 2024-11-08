@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from "@jest/globals";
-import { VattenfallEuropeSales } from "../src";
-import { VattenfallServiceError } from "../src/errors";
+import { VattenfallEuropeSales, VattenfallServiceError } from "../src";
 import { Config, Responses } from "./helpers";
 
 describe("VattenfallServiceError", () => {
