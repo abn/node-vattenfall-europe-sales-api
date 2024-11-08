@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "@jest/globals";
 import fetchMock from "fetch-mock";
 
-import VattenfallEuropeSales from "../src";
+import { VattenfallEuropeSales } from "../src";
 import * as Errors from "../src/errors";
 import * as Types from "../src/types";
 import { Config, Responses, Util } from "./helpers";

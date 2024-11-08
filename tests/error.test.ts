@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "@jest/globals";
-import VattenfallEuropeSales from "../src";
+import { VattenfallEuropeSales } from "../src";
 import { VattenfallServiceError } from "../src/errors";
 import { Config, Responses } from "./helpers";
 

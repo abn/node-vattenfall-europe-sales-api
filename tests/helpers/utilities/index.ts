@@ -1,6 +1,6 @@
 import fetchMock, { FetchMock, RouteResponse } from "fetch-mock";
 import type { CallHistoryFilter } from "fetch-mock/dist/esm/CallHistory";
-import VattenfallEuropeSales from "../../../src";
+import { VattenfallEuropeSales } from "../../../src";
 import * as Responses from "../responses";
 
 type AllowedFetchMockMethods = keyof FetchMock & ("post" | "postOnce");
