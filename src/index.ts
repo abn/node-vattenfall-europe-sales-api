@@ -53,20 +53,20 @@ export class VattenfallService {
      * within the system. It ensures that each transaction can be
      * distinctly identified.
      */
-    public readonly transaction_id: string;
+    public _transaction_id: string;
 
     /**
      * Represents the username of a user in the system.
      * This is a string that uniquely identifies a user.
      */
-    protected readonly username: string;
+    protected _username: string;
 
     /**
      * Represents the password of a user.
      * This string is used for authenticating the user.
      * It should be kept confidential and secured.
      */
-    protected readonly password: string;
+    protected _password: string;
 
     /**
      * Represents the properties associated with the service, retrieved at instantiation time from
@@ -107,9 +107,27 @@ export class VattenfallService {
      * @param password - The password for the instance.
      */
     constructor(username: string, password: string) {
-        this.transaction_id = crypto.randomUUID().toUpperCase();
-        this.username = username;
-        this.password = password;
+        this._transaction_id = crypto.randomUUID().toUpperCase();
+        this._username = username;
+        this._password = password;
+    }
+
+    /**
+     * Gets the current username.
+     *
+     * @returns The current username.
+     */
+    get username(): string {
+        return this._username;
+    }
+
+    /**
+     * Retrieves the current password.
+     *
+     * @returns The current password.
+     */
+    get password(): string {
+        return this._password;
     }
 
     /**
@@ -117,7 +135,7 @@ export class VattenfallService {
      *
      * @returns The access token data, or undefined if not set.
      */
-    protected get access_token_data(): Types.AccessTokenData | undefined {
+    public get access_token_data(): Types.AccessTokenData | undefined {
         return this._access_token_data;
     }
 
@@ -126,7 +144,7 @@ export class VattenfallService {
      *
      * @returns The service properties if available, otherwise undefined.
      */
-    protected get service_properties(): Types.ServiceProperties | undefined {
+    public get service_properties(): Types.ServiceProperties | undefined {
         return this._properties;
     }
 
@@ -136,7 +154,7 @@ export class VattenfallService {
      * @param message - The error message to be included in the VattenfallApiError.
      * @returns This method does not return as it always throws an error.
      */
-    protected error(message: string): never {
+    public error(message: string): never {
         throw new Errors.VattenfallServiceError({ message: message });
     }
 
@@ -173,6 +191,31 @@ export class VattenfallService {
     }
 
     /**
+     * Resets the transaction ID for the current session.
+     *
+     * @param id - Optional parameter to set a specific transaction ID. If not provided, a new UUID will be generated and used.
+     * @returns - A promise that resolves when the transaction ID has been reset.
+     */
+    public async resetTransactionId(id?: string): Promise<void> {
+        // we should force a logout if this is required
+        await this.logOut();
+        this._transaction_id = id ?? crypto.randomUUID().toUpperCase();
+    }
+
+    /**
+     * Asynchronously sets the user credentials for a transaction.
+     *
+     * @param username - The username to be set.
+     * @param password - The password to be set.
+     */
+    public async setCredentials(username: string, password: string): void {
+        await this.resetTransactionId();
+
+        this._username = username;
+        this._password = password;
+    }
+
+    /**
      * Fetches and returns the service properties.
      * If the service properties have been previously fetched and stored, it returns the stored properties.
      * Otherwise, it fetches the properties from a predefined URL, stores them, and then returns them.
@@ -180,8 +223,8 @@ export class VattenfallService {
      *
      * @returns A promise that resolves to the service properties.
      */
-    public async getServiceProperties(): Promise<Types.ServiceProperties> {
-        if (!this._properties) {
+    public async getServiceProperties(refresh: boolean = false): Promise<Types.ServiceProperties> {
+        if (!this._properties || refresh) {
             this._properties =
                 ((await fetch(this.service_properties_uri)
                     .then((response) => response.json())
@@ -219,7 +262,7 @@ export class VattenfallService {
 
     /**
      * Makes an HTTP request to the specified URI with the given method and data. This is an internal method that
-     * returns a {Response} object.
+     * returns a {@link Response} object.
      *
      * @param uri - The endpoint URI to which the request is made.
      * @param method - The HTTP method to be used for the request (e.g., GET, POST).
@@ -249,7 +292,7 @@ export class VattenfallService {
 
         if (data && (method === Types.HTTPMethod.POST || method === Types.HTTPMethod.PUT)) {
             options.body = JSON.stringify({
-                TransaktionsId: this.transaction_id,
+                TransaktionsId: this._transaction_id,
                 Client: this.api_client,
                 Mandant: this.api_tenant,
                 ...(this._parent_log_id ? { ParentLogId: this._parent_log_id } : {}),
@@ -265,8 +308,8 @@ export class VattenfallService {
     /**
      * Processes the HTTP response and returns it in the specified format.
      *
-     * @param {Response} response - The HTTP response to process.
-     * @return {Promise<R>} The processed response in the specified format.
+     * @param response - The HTTP response to process.
+     * @returns The processed response in the specified format.
      */
     protected async _processResponse<R extends Types.Response>(response: Response): Promise<R> {
         if (response.body == null) return {} as R;
@@ -315,7 +358,7 @@ export class VattenfallService {
      *
      * @param uri - The URI to send the POST request to.
      * @param data - The data to be sent with the POST request.
-     * @returns {Promise<R>} - A promise that resolves to the response data.
+     * @returns A promise that resolves to the response data.
      */
     public async post<R extends Types.Response, D extends Types.RequestData>(uri: string, data: D): Promise<R> {
         return this.request(uri, Types.HTTPMethod.POST, data);
@@ -393,8 +436,8 @@ export class VattenfallService {
                 "/Account/GetTokenUser",
                 {
                     Tenant: this.api_client,
-                    Username: this.username,
-                    Passwort: this.password,
+                    Username: this._username,
+                    Passwort: this._password,
                     Werte: {
                         TwoStepAuth: "true",
                         CheckOnlyBenutzerId: "false",
@@ -408,6 +451,10 @@ export class VattenfallService {
 
         if (this._access_token_data?.AccessToken === undefined) this.error("Access token cannot be accessed");
         return this._access_token_data.AccessToken;
+    }
+
+    public async logIn(): Promise<void> {
+        await this.getAccessToken();
     }
 
     /**
@@ -441,7 +488,7 @@ export class VattenfallService {
     public async getAccount(): Promise<Types.Account> {
         return this.post<Types.Account, Types.AccountRequestData>("/Account/GetAccount", {
             Tenant: this.api_client,
-            Username: this.username,
+            Username: this._username,
         });
     }
 
@@ -452,7 +499,7 @@ export class VattenfallService {
      */
     public async getContractList(): Promise<Types.ContractResponse> {
         return this.post<Types.ContractResponse, Types.ContractListRequestData>("/Vertrag/GetVertragsliste", {
-            Username: this.username,
+            Username: this._username,
             Werte: {
                 // if set to false DokumentenVersandArt field will return null
                 DOKUMENTENVERSANDART: true,

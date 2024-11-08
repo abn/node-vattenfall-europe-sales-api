@@ -41,10 +41,11 @@ export function mockFetchRoute(
 }
 
 /**
- * Extracts and returns request data from the provided {RequestInit} instance if
+ * Extracts and returns request data from the provided {@link RequestInit} instance if
  * provided, otherwise from the last API call that matches the provided filter
  * in the call history.
  *
+ * @typeParam D - The type of data expected in the request body.
  * @param filter - An optional filter to apply to fetch
  * calls from the call history.
  * @param init - Optional request initialization data. If not
@@ -52,8 +53,6 @@ export function mockFetchRoute(
  * the filter.
  *
  * @returns The extracted request data if available, otherwise null.
- *
- * @template D - The type of data expected in the request body.
  */
 export function extractRequestData<D>(filter?: CallHistoryFilter, init?: RequestInit): null | D {
     if (init === undefined) {
