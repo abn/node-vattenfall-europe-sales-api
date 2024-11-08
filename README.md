@@ -26,7 +26,9 @@ async function displayMeterReadings() {
         for (const contract_id of contract_ids) {
             console.log(`Meter readings for contract ${contract_id}:`);
 
-            const meter_readings = VattenfallServiceHelpers.mapMeterReadings(await service.getMeterReadings(contract_id));
+            const meter_readings = VattenfallServiceHelpers.mapMeterReadings(
+                await service.getMeterReadings(contract_id),
+            );
             console.log(meter_readings);
         }
     } catch (e) {
