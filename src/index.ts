@@ -265,7 +265,7 @@ export default class VattenfallEuropeSales {
      * @param {Response} response - The HTTP response to process.
      * @return {Promise<R>} The processed response in the specified format.
      */
-    async _processResponse<R extends Types.Response>(response: Response): Promise<R> {
+    protected async _processResponse<R extends Types.Response>(response: Response): Promise<R> {
         if (response.body == null) return {} as R;
 
         const response_json = (await response.json().catch(() => {})) as R;
