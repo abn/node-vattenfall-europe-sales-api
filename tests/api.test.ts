@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "@jest/globals";
 import fetchMock from "fetch-mock";
 
-import { VattenfallService } from "../src";
+import { VattenfallService, VattenfallServiceHelpers } from "../src";
 import * as Errors from "../src/errors";
 import * as Types from "../src/types";
 import { Config, Responses, Util } from "./helpers";
@@ -158,6 +158,8 @@ describe("VattenfallEuropeSales", () => {
         Util.mockFetchRoute(service, "/Vertrag/GetVertragsliste", Responses.mockContractListResponse, true);
         const contracts = await service.getContractList();
         expect(contracts).toEqual(Responses.mockContractListResponse);
+
+        expect(VattenfallServiceHelpers.getContractIDs(contracts)).toEqual(["test-contract-id"]);
     });
 
     it("should get single contract", async () => {
@@ -170,6 +172,16 @@ describe("VattenfallEuropeSales", () => {
         Util.mockFetchRoute(service, "/Zaehlerstand/GetZaehlerstaende", Responses.mockMeterReadingsResponse, true);
         const meterReadings = await service.getMeterReadings("test-contract-id");
         expect(meterReadings).toEqual(Responses.mockMeterReadingsResponse);
+
+        expect(VattenfallServiceHelpers.mapMeterReadings(meterReadings)).toEqual({
+            "1234567890": [
+                {
+                    consumption: 100,
+                    date: "2024-01-01",
+                    reading: 1000,
+                },
+            ],
+        });
     });
 
     it("should log out", async () => {
