@@ -5,9 +5,9 @@ export * as VattenfallServiceHelpers from "./helpers";
 export { VattenfallServiceError } from "./errors";
 
 /**
- * Represents the Vattenfall Europe Sales service, providing methods to interact with the service's API.
+ * Represents the Vattenfall Service, providing methods to interact with the service's API.
  */
-export class VattenfallEuropeSales {
+export class VattenfallService {
     /**
      * The version number of the API that the application is currently using.
      * This variable helps in managing and differentiating between different

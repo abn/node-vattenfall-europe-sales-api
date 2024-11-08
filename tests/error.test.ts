@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from "@jest/globals";
-import { VattenfallEuropeSales, VattenfallServiceError } from "../src";
+import { VattenfallService, VattenfallServiceError } from "../src";
 import { Config, Responses } from "./helpers";
 
 describe("VattenfallServiceError", () => {
-    let service: VattenfallEuropeSales;
+    let service: VattenfallService;
 
     beforeEach(() => {
-        service = new VattenfallEuropeSales(Config.TEST_USERNAME, Config.TEST_PASSWORD);
+        service = new VattenfallService(Config.TEST_USERNAME, Config.TEST_PASSWORD);
     });
 
     it("should be created with only message", () => {

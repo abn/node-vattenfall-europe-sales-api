@@ -1,6 +1,6 @@
 import fetchMock, { FetchMock, RouteResponse } from "fetch-mock";
 import type { CallHistoryFilter } from "fetch-mock/dist/esm/CallHistory";
-import { VattenfallEuropeSales } from "../../../src";
+import { VattenfallService } from "../../../src";
 import * as Responses from "../responses";
 
 type AllowedFetchMockMethods = keyof FetchMock & ("post" | "postOnce");
@@ -17,7 +17,7 @@ type AllowedFetchMockMethods = keyof FetchMock & ("post" | "postOnce");
  * @returns The filter string used for mocking the route.
  */
 export function mockFetchRoute(
-    service: VattenfallEuropeSales,
+    service: VattenfallService,
     path: string,
     response: RouteResponse,
     authenticated: boolean = false,

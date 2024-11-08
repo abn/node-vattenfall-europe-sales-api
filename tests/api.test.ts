@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "@jest/globals";
 import fetchMock from "fetch-mock";
 
-import { VattenfallEuropeSales } from "../src";
+import { VattenfallService } from "../src";
 import * as Errors from "../src/errors";
 import * as Types from "../src/types";
 import { Config, Responses, Util } from "./helpers";
@@ -9,13 +9,13 @@ import { Config, Responses, Util } from "./helpers";
 fetchMock.mockGlobal();
 
 describe("VattenfallEuropeSales", () => {
-    let service: VattenfallEuropeSales;
+    let service: VattenfallService;
     let get_token_path_filter: string;
 
     beforeEach(() => {
         fetchMock.clearHistory().removeRoutes();
 
-        service = new VattenfallEuropeSales(Config.TEST_USERNAME, Config.TEST_PASSWORD);
+        service = new VattenfallService(Config.TEST_USERNAME, Config.TEST_PASSWORD);
         service.setDebugLogging(false);
 
         fetchMock.get(service.service_properties_uri, Responses.mockServicePropertiesResponse, {
@@ -38,7 +38,7 @@ describe("VattenfallEuropeSales", () => {
     });
 
     it("should be created", () => {
-        expect(service).toBeInstanceOf(VattenfallEuropeSales);
+        expect(service).toBeInstanceOf(VattenfallService);
     });
 
     it("should fetch service properties", async () => {

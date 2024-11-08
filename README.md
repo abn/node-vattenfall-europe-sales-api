@@ -15,19 +15,18 @@ pnpm add vattenfall-europe-sales-api
 ## Example Usage
 
 ```typescript
-import VattenfallEuropeSales from "vattenfall-europe-sales-api";
-import * as Helpers from "vattenfall-europe-sales-api/dist/helpers";
+import { VattenfallService, VattenfallServiceHelpers } from "vattenfall-europe-sales-api";
 
 async function displayMeterReadings() {
-    const service = new VattenfallEuropeSales("your-username", "your-password");
+    const service = new VattenfallService("your-username", "your-password");
 
     try {
-        const contract_ids = Helpers.getContractIDs(await service.getContractList());
+        const contract_ids = VattenfallServiceHelpers.getContractIDs(await service.getContractList());
 
         for (const contract_id of contract_ids) {
             console.log(`Meter readings for contract ${contract_id}:`);
 
-            const meter_readings = Helpers.mapMeterReadings(await service.getMeterReadings(contract_id));
+            const meter_readings = VattenfallServiceHelpers.mapMeterReadings(await service.getMeterReadings(contract_id));
             console.log(meter_readings);
         }
     } catch (e) {
