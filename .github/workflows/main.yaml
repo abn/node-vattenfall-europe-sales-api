@@ -69,7 +69,7 @@ jobs:
           echo "dist=${package_name}-${package_version}.tgz" >> $GITHUB_OUTPUT
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist-tarball
           path: |
